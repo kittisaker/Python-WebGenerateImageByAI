@@ -31,3 +31,5 @@ image = pipe(prompt,num_inference_steps=100).images[0]
 image.save(f"image.png")
 image
 ```
+
+---
