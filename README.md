@@ -1,33 +1,52 @@
 # Create AI for Generate Image
 
-## Python Generate Image
+## FastAPI
 
-* Check GPU runtime
+* Installation
 ```
-$ !nvidia-smi
-```
+$ !pip install fastapi nest-asyncio pyngrok uvicorn
 
-## Python Generate Image
-
-* Install the necessary libraries
-
-```python
-$ !pip install diffusers==0.11.1
-$ !pip install transformers scipy ftfy accelerate
+!ngrok config add-authtoken 2Vktl5xYJINv18FesZykb8pnwQK_6Hm9qtKwiQdmSZSxkQyJq
 ```
 
 * Code
 
 ```python
-import torch
-from diffusers import StableDiffusionPipeline
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import nest_asyncio
+from pyngrok import ngrok
+import uvicorn
 
-pipe = StableDiffusionPipeline.from_pretrained("CompVis/stable-diffusion-v1-4"
-, torch_dtype=torch.float16)
-pipe = pipe.to("cuda")
-prompt = "cat flying in space"
+app = FastAPI()
 
-image = pipe(prompt,num_inference_steps=100).images[0]
-image.save(f"image.png")
-image
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=['*'],
+  allow_credentials=True,
+  allow_methods=['*'],
+  allow_headers=['*'],
+)
+
+@app.get('/')
+async def root():
+  return {'hello' : 'world'}
+
+ngrok_tunnel = ngrok.connect(8000)
+print('Public URL:', ngrok_tunnel.public_url)
+
+nest_asyncio.apply()
+uvicorn.run(app, port=8000)
 ```
+
+```java
+@app.get('/generate-image')
+async def generate_image(prompt:str):
+    image = pipe(prompt,num_inference_steps=100).images[0]
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    imgstr = base64.b64encode(buffer.getvalue())
+    return Response(content=imgstr, media_type="image/png")
+```
+
+---
