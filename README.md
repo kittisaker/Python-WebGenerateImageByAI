@@ -7,9 +7,7 @@
 $ !nvidia-smi
 ```
 
-## Python Generate Image
-
-* Install the necessary libraries
+## Install the necessary libraries
 
 ```python
 $ !pip install diffusers==0.11.1
